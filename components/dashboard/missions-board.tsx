@@ -2,16 +2,27 @@
 
 import { useState } from "react"
 import { Check, Plus, Swords } from "lucide-react"
-import { missions as initialMissions, tagStyles, type Mission } from "@/lib/data"
+import {
+  missions as initialMissions,
+  tagStyles,
+  type Mission,
+  user,
+  boss,
+} from "@/lib/data"
+
 import { BossCard } from "@/components/dashboard/boss-card"
 import { cn } from "@/lib/utils"
-import { boss } from "@/lib/data"
 
 export function MissionsBoard({
   showBoss = true,
+  userData,
+  setUserData,
 }: {
   showBoss?: boolean
+  userData: typeof user
+  setUserData: React.Dispatch<React.SetStateAction<typeof user>>
 }) {
+
   const [missions, setMissions] =
     useState<Mission[]>(initialMissions)
 
@@ -48,27 +59,42 @@ export function MissionsBoard({
   )
 
   function concluirMissao(id: string) {
-    const mission = missions.find(
-      (m) => m.id === id,
-    )
+  const mission = missions.find(
+    (m) => m.id === id,
+  )
 
-    if (!mission) return
+  if (!mission || mission.done) return
 
-    if (mission.done) return
+  setUserData((prev) => {
+    const novoXp = prev.xp + mission.xp
 
-    console.log(
-      "Missão concluída:",
-      mission.title,
-    )
+    if (novoXp >= prev.xpToNext) {
+      return {
+        ...prev,
+        level: prev.level + 1,
+        xp: novoXp - prev.xpToNext,
+        xpToNext: Math.floor(prev.xpToNext * 1.25),
+        totalXp: prev.totalXp + mission.xp,
+        completedMissions: prev.completedMissions + 1,
+      }
+    }
 
-    setMissions((prev) =>
-      prev.map((m) =>
-        m.id === id
-          ? { ...m, done: true }
-          : m,
-      ),
-    )
-  }
+    return {
+      ...prev,
+      xp: novoXp,
+      totalXp: prev.totalXp + mission.xp,
+      completedMissions: prev.completedMissions + 1,
+    }
+  })
+
+  setMissions((prev) =>
+    prev.map((m) =>
+      m.id === id
+        ? { ...m, done: true }
+        : m,
+    ),
+  )
+}
 
   function nivelMission() {
     if (difficulty === "facil") {
@@ -131,9 +157,14 @@ export function MissionsBoard({
                 Missões do dia
               </h2>
 
+              <p className="text-sm font-semibold text-primary">
+                XP Atual: {userData.xp}
+              </p>
+
               <p className="text-sm text-muted-foreground">
                 {doneCount}/
-                {missions.length} concluídas ·{" "}
+                {missions.length}
+                {" "}concluídas ·{" "}
                 {earnedXp} XP ganhos
               </p>
             </div>
@@ -194,9 +225,7 @@ export function MissionsBoard({
                   </span>
 
                   <span className="text-sm text-muted-foreground">
-                    {
-                      mission.description
-                    }
+                    {mission.description}
                   </span>
                 </span>
 

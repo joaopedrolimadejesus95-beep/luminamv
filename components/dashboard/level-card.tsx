@@ -1,8 +1,17 @@
 import { Sparkles } from "lucide-react"
-import { user } from "@/lib/data"
 
 
-export function LevelCard() {
+
+export function LevelCard({
+  user,
+}: {
+  user: {
+    level: number
+    xp: number
+    xpToNext: number
+    title: string
+  }
+}) {
   const pct = Math.round((user.xp / user.xpToNext) * 100)
 
   return (

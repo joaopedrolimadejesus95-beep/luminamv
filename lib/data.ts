@@ -18,15 +18,17 @@ import {
   CalendarCheck,
 } from "lucide-react"
 
+
+
 export const user = {
   name: "João",
   title: "Explorador",
-  level: 12,
-  xp: 2840,
-  xpToNext: 4000,
-  totalXp: 18420,
-  streak: 14,
-  completedMissions: 187,
+  level: 0,
+  xp: 0,
+  xpToNext: 100,
+  totalXp: 0,
+  streak: 0,
+  completedMissions: 0,
   avatar: "/lumina-avatar.png",
 }
 
